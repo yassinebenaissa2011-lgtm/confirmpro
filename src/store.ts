@@ -1,3 +1,4 @@
+const ACCOUNTS=[{id:'admin1',name:'Admin',phone:'0600000001',password:'admin123',role:'admin'},{id:'wa1',name:'Fatima Zahra',phone:'0600000002',password:'fatima123',role:'confirmatrice_whatsapp'},{id:'wa2',name:'Khadija',phone:'0600000003',password:'khadija123',role:'confirmatrice_whatsapp'},{id:'wa3',name:'Salma',phone:'0600000004',password:'salma123',role:'confirmatrice_whatsapp'},{id:'ap1',name:'Amina',phone:'0600000005',password:'amina123',role:'confirmatrice_appel'},{id:'ap2',name:'Nadia',phone:'0600000006',password:'nadia123',role:'confirmatrice_appel'}];
 import{saveStatus}from"./api";
 import { create } from 'zustand';
 import {
@@ -230,8 +231,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   currentPage: 'dashboard',
   language: 'fr',
 
-  login: (email: string) => {
-    const user = get().users.find(u => u.email === email);
+  login: (phone: string, password: string) => {
+    const acc=ACCOUNTS.find(a=>a.phone===phone&&a.password===password);if(!acc)return false;const user = get().users.find(u => u.id === acc.id);
     if (user) set({ currentUser: user });
   },
 

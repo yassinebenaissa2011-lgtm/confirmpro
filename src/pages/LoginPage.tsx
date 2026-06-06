@@ -1,84 +1,46 @@
 import { useState } from 'react';
 import { useAppStore } from '../store';
-import { MessageSquare, Phone, Shield, Eye, EyeOff } from 'lucide-react';
-
-const accounts = [
-  { email: 'admin@confirmpro.ma', role: 'admin', name: 'Youssef Admin', icon: Shield, color: '#6C63FF' },
-  { email: 'fatima@confirmpro.ma', role: 'whatsapp', name: 'Fatima Zahra', icon: MessageSquare, color: '#10B981' },
-  { email: 'amina@confirmpro.ma', role: 'appel', name: 'Amina K.', icon: Phone, color: '#F59E0B' },
-];
+import { Eye, EyeOff, LogIn } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAppStore();
-  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [show, setShow] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleLogin = () => {
+    if (!login(phone, password)) {
+      setError('Numero ou mot de passe incorrect');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0F172A] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
+      <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-2xl bg-[#6C63FF] flex items-center justify-center font-bold text-3xl mx-auto mb-4 shadow-lg shadow-[#6C63FF]/25">
-            CP
-          </div>
-          <h1 className="text-3xl font-bold mb-1">ConfirmPro</h1>
-          <p className="text-slate-400">نظام تأكيد الطلبات</p>
+          <div className="w-20 h-20 rounded-2xl bg-[#6C63FF] flex items-center justify-center font-bold text-3xl mx-auto mb-4 shadow-lg shadow-[#6C63FF]/25">CP</div>
+          <h1 className="text-2xl font-bold">ConfirmPro</h1>
+          <p className="text-slate-400 text-sm">Confirmation des commandes</p>
         </div>
-
-        {/* Demo Accounts */}
         <div className="bg-[#1E293B] rounded-2xl border border-slate-700/50 p-6">
-          <h2 className="text-lg font-semibold mb-1">Connexion</h2>
-          <p className="text-sm text-slate-400 mb-5">Choisissez un compte de démonstration</p>
-
-          <div className="space-y-3">
-            {accounts.map(account => {
-              const Icon = account.icon;
-              return (
-                <button
-                  key={account.email}
-                  onClick={() => {
-                    setSelectedAccount(account.email);
-                    setTimeout(() => login(account.email), 300);
-                  }}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all ${
-                    selectedAccount === account.email
-                      ? 'border-[#6C63FF]/50 bg-[#6C63FF]/10 scale-[0.98]'
-                      : 'border-slate-700/50 bg-slate-800/30 hover:border-slate-600 hover:bg-slate-800/60'
-                  }`}
-                >
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: `${account.color}20` }}
-                  >
-                    <Icon size={22} style={{ color: account.color }} />
-                  </div>
-                  <div className="text-left flex-1">
-                    <p className="font-medium text-sm">{account.name}</p>
-                    <p className="text-xs text-slate-400">{account.email}</p>
-                  </div>
-                  <span
-                    className="text-[10px] font-bold px-2 py-1 rounded-full"
-                    style={{
-                      backgroundColor: `${account.color}20`,
-                      color: account.color
-                    }}
-                  >
-                    {account.role.toUpperCase()}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-5 pt-4 border-t border-slate-700/50">
-            <p className="text-[10px] text-slate-600 text-center">
-              🔒 Mode démonstration — Toutes les données sont simulées
-            </p>
+          <h2 className="text-lg font-semibold mb-4">Connexion</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs text-slate-400 mb-1 block">Numero de telephone</label>
+              <input type="tel" value={phone} onChange={e => { setPhone(e.target.value); setError(''); }} onKeyDown={e => { if (e.key === 'Enter') handleLogin(); }} placeholder="06XXXXXXXX" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#6C63FF]" autoFocus />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 mb-1 block">Mot de passe</label>
+              <div className="relative">
+                <input type={show ? 'text' : 'password'} value={password} onChange={e => { setPassword(e.target.value); setError(''); }} onKeyDown={e => { if (e.key === 'Enter') handleLogin(); }} placeholder="........" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#6C63FF]" />
+                <button onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">{show ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+              </div>
+            </div>
+            {error && <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 text-xs text-red-400">{error}</div>}
+            <button onClick={handleLogin} disabled={!phone || !password} className="w-full py-3 rounded-xl bg-[#6C63FF] text-white font-medium text-sm hover:bg-[#5B54E6] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"><LogIn size={16} /> Se connecter</button>
           </div>
         </div>
-
-        <p className="text-center text-xs text-slate-600 mt-6">
-          ConfirmPro v1.0 — Order Confirmation Management System
-        </p>
       </div>
     </div>
   );
