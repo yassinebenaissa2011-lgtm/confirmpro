@@ -206,7 +206,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   currentUser: null,
   users: mockUsers,
   products: mockProducts,
-  orders: mockOrders,
+  orders: [],
   clients: mockClients,
   commissions: mockCommissions,
   orderHistory: [],
@@ -515,35 +515,27 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   apiConnected: false,
-  apiUrl: 'http://localhost:3001',
+  apiUrl: '',
 
   syncFromApi: async () => {
-    const state = get();
     try {
-      const res = await fetch(`${state.apiUrl}/api/orders`);
+      const res = await fetch('/api/orders');
       if (res.ok) {
         const apiOrders = await res.json();
-        // دمج les commandes من API مع les mock orders
-        if (apiOrders.length > 0) {
-          const existingIds = new Set(state.orders.map(o => o.id));
-          const newFromApi = apiOrders.filter((o: Order) => !existingIds.has(o.id));
-          if (newFromApi.length > 0) {
-            set({ orders: [...newFromApi, ...state.orders], apiConnected: true });
-          } else {
-            set({ apiConnected: true });
-          }
-        }
+        // دائماً نبدّل mock data بالبيانات الحقيقية من API
+        set({ orders: apiOrders, apiConnected: true });
       }
     } catch {
-      set({ apiConnected: false });
+      // API ما يمكنش، نخليو mock data
     }
   },
 
   triggerServerSync: async () => {
-    const state = get();
     try {
-      await fetch(`${state.apiUrl}/api/sync`, { method: 'POST' });
-      await state.syncFromApi();
+      // اولاً خلّي السيرفر يسحب من Google Sheet
+      await fetch('/api/sync', { method: 'POST' });
+      // من بعد اقرا les orders
+      await get().syncFromApi();
     } catch {
       // ignore
     }
