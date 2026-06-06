@@ -1,3 +1,4 @@
+import{saveStatus}from"./api";
 import { create } from 'zustand';
 import {
   User, Product, Order, Client, Commission, OrderHistoryEntry,
@@ -243,6 +244,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     const order = state.orders.find(o => o.id === orderId);
     if (!order) return state;
     const oldStatus = order.status;
+    saveStatus(orderId,newStatus,note);
     const updatedOrders = state.orders.map(o =>
       o.id === orderId ? { ...o, status: newStatus, updatedAt: new Date().toISOString(), lastContactedAt: new Date().toISOString() } : o
     );
